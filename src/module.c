@@ -164,7 +164,9 @@ static int doAddDocument(RedisModuleCtx *ctx, RedisModuleString **argv, int argc
   Document_PrepareForAdd(&doc, argv[2], ds, argv, fieldsIdx, argc, lang, payload, ctx);
   if (!Document_CanAdd(&doc, sp, replace)) {
     Document_FreeDetached(&doc, ctx);
-    RedisModule_ReplyWithError(ctx, "Document already in index");
+    char *errStr = NULL;
+    asprintf(&errStr, "Document %s already in index", RedisModule_StringPtrLen(doc.docKey, NULL));
+    RedisModule_ReplyWithError(ctx, errStr);
     goto cleanup;
   }
   if (!nosave) {
